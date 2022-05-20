@@ -1,0 +1,45 @@
+baseURL: https://trey-capps.github.io
+languageCode: en-us
+title: Trey Capps
+theme: "PaperMod"
+
+params:
+    title: Trey Capps
+    description: "Personal Website"
+    
+    # profile-mode
+    profileMode:
+        enabled: true
+        title: Trey Capps
+        subtitle: I never mind what I speak.
+        imageUrl: me_pic.jpg
+        imageWidth: 115
+        imageHeight: 115
+        imageTitle: my image
+
+    socialIcons:
+        - name: linkedin
+          url: https://www.linkedin.com/in/trey-capps/
+        - name: github
+          url: https://github.com/trey-capps
+        - name: CV
+          url: www.google.com
+        - name: email
+          url: mailto:trey.capps@yahoo.com
+        - name: medium
+          url: https://medium.com/@trey.capps
+       
+menu:
+    main:
+        - identifier: about
+          name: About
+          url: /about
+          weight: 1
+        - identifier: projects
+          name: Projects
+          url: /posts
+          weight: 2
+        - identifier: blog
+          name: Blog
+          url: https://medium.com/@trey.capps
+          weight: 3
