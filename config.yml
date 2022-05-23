@@ -1,0 +1,111 @@
+baseURL: "https://trey-capps.github.io"
+languageCode: en-us
+title: Trey Capps
+theme: "PaperMod"
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+pygmentsUseClasses: true
+
+googleAnalytics: ""
+
+minify:
+    disableXML: true
+    minifyOutput: true
+
+params:
+    env: production # to enable google analytics, opengraph, twitter-cards and schema.
+    title: Trey Capps
+    description: "Trey Capps personal site"
+    keywords: [Blog, Portfolio, PaperMod]
+    author: Me
+    DateFormat: "January 2, 2006"
+    defaultTheme: auto # dark, light
+    disableThemeToggle: false
+
+    ShowReadingTime: true
+    ShowShareButtons: false
+    ShowPostNavLinks: true
+    ShowBreadCrumbs: true
+    ShowCodeCopyButtons: false
+    disableSpecial1stPost: false
+    disableScrollToTop: false
+    comments: false
+    hidemeta: false
+    hideSummary: false
+    showtoc: false
+    tocopen: false
+
+    assets:
+        # disableHLJS: true # to disable highlight.js
+        # disableFingerprinting: true
+        favicon: "<link / abs url>"
+        favicon16x16: "<link / abs url>"
+        favicon32x32: "<link / abs url>"
+        apple_touch_icon: "<link / abs url>"
+        safari_pinned_tab: "<link / abs url>"
+
+    label:
+        text: "Trey Capps' Personal Site"
+        iconHeight: 35
+
+    # profile-mode
+    profileMode:
+        enabled: true # needs to be explicitly set
+        title: Trey Capps
+        subtitle: "Welcome"
+        imageUrl: "me_pic.jpg"
+        imageWidth: 120
+        imageHeight: 120
+        imageTitle: my image
+        buttons:
+            - name: Projects
+              url: posts
+
+    # home-info mode
+    homeInfoParams:
+        Title: "Hi there \U0001F44B"
+        Content: Welcome to my site
+
+    socialIcons:
+        - name: linkedin
+          url: https://www.linkedin.com/in/trey-capps/
+        - name: github
+          url: https://github.com/trey-capps
+        - name: CV
+          url: www.google.com
+        - name: email
+          url: mailto:trey.capps@yahoo.com
+        - name: medium
+          url: https://medium.com/@trey.capps
+
+    analytics:
+        google:
+            SiteVerificationTag: "XYZabc"
+        bing:
+            SiteVerificationTag: "XYZabc"
+        yandex:
+            SiteVerificationTag: "XYZabc"
+
+    cover:
+        hidden: true # hide everywhere but not in structured data
+        hiddenInList: true # hide on list pages and home
+        hiddenInSingle: true # hide on single page
+
+    editPost:
+        URL: "https://github.com/trey-capps/trey-capps.github.io"
+        Text: "Suggest Changes" # edit text
+        appendFilePath: true # to append file path to Edit link
+
+menu:
+    main:
+        - identifier: about
+          name: About
+          url: /about/
+          weight: 1
+        - identifier: projects
+          name: Projects
+          url: /posts/
+          weight: 2
