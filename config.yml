@@ -55,8 +55,8 @@ params:
     profileMode:
         enabled: true # needs to be explicitly set
         title: Trey Capps
-        subtitle: "Welcome"
-        imageUrl: "static/me_pic.jpg"
+        subtitle: "Welcome to my site!"
+        imageUrl: "me_pic.jpg"
         imageWidth: 120
         imageHeight: 120
         imageTitle: my image
