@@ -1,4 +1,4 @@
-baseURL: "https://trey-capps.github.io"
+baseURL: "https://www.treycapps.com"
 languageCode: en-us
 title: Trey Capps
 theme: "PaperMod"
@@ -56,7 +56,7 @@ params:
         enabled: true # needs to be explicitly set
         title: Trey Capps
         subtitle: "Welcome"
-        imageUrl: "me_pic.jpg"
+        imageUrl: "http://www.treycapps.com/static/me_pic.jpg"
         imageWidth: 120
         imageHeight: 120
         imageTitle: my image
