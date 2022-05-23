@@ -73,12 +73,12 @@ params:
         Content: Welcome to my site
 
     socialIcons:
-        - name: linkedin
-          url: https://www.linkedin.com/in/trey-capps/
         - name: github
           url: https://github.com/trey-capps
         - name: email
           url: mailto:trey.capps@gmail.com
+        - name: linkedin
+          url: https://www.linkedin.com/in/trey-capps/
 
     analytics:
         google:
