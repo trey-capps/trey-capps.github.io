@@ -9,22 +9,22 @@ draft: false
 ## Overview
 Questions of interest:
 - What are the most important factors contributing to a person's happiness? 
-- Do any specific regions to to be happier than others?
+- Do any specific regions to be happier than others?
 
-This project was based off Kaggle's World Happiness Report Dataset found [here](https://www.kaggle.com/datasets/unsdsn/world-happiness).
+This project was based on Kaggle's World Happiness Report Dataset found [here](https://www.kaggle.com/datasets/unsdsn/world-happiness).
 
 *To supplement this analysis a [Tableau Dashboard](https://public.tableau.com/app/profile/trey.capps/viz/HappinessAnalysis_16267395880800/Dashboard1) was created to help visualize region and country happiness for each year.*
 
 ## Explore Data
 ### Load Data
-Kaggle provides csv files for the years 2015 to 2019. Pandas can be used to load each years csv.
+Kaggle provides csv files for the years 2015 to 2019. Pandas can be used to load each year's csv file.
 
 2015 example below:
 ```
 df15 = pd.read_csv('2015.csv')
 ```
 ### Cleaning
-Once the datasets have been loaded, it appears the data structure is different for 2017, 2018, and 2019. Any dataset specific variable creation can be done before merging all datasets. For years 2017 to 2019, the 'Region' column has not been given. This will be important for visualizations and may be considered for the model. We can use the Country-Region pairs from 2015 to see if we can impute this column. A simple function was made:
+Once the datasets have been loaded, it appears the data structure is different for 2017, 2018, and 2019. Any dataset-specific variable creation can be done before merging all datasets. For years 2017 to 2019, the 'Region' column has not been given. This will be important for visualizations and may be considered for the model. We can use the Country-Region pairs from 2015 to see if we can impute this column. A simple function was made:
 ```
 region = df15.set_index('Country').to_dict()['Region']
 def find_region(df):    
@@ -35,13 +35,13 @@ def find_region(df):
     
     return df
 ```
-This function can be applied to 2017, 2018, and 2019 dataframes.
+This function can be applied to 2017, 2018, and 2019 data frames.
 
 2017 Example:
 ```
 df17 = df17.apply(find_region, axis = 1)
 ```
-To determine the results of our imputation, we can consdier how many NaN values are in the 'Region' column.
+To determine the results of our imputation, we can consider how many NaN values are in the 'Region' column.
 ```
 print(df17.isna().sum())
 ```
@@ -52,7 +52,7 @@ The datasets can now be concatenated.
 frames = [df15, df16, df17, df18, df19]
 df_all = pd.concat(frames)
 ```
-It is important for this analysis to not drop the rows with a missing 'Region' column. Because there is only 19 missing values, these regions will be manually inputed (Chances are they are similar across 2017, 2018, and 2019). To determine which countires are misisng a region we can loop through each country.
+It is important for this analysis to not drop the rows with a missing 'Region' column. Because there are only 19 missing values, these regions will be manually input (Chances are they are similar across 2017, 2018, and 2019). To determine which countries are missing a region we can loop through each country.
 ```
 result = df_all[df_all['Region'].isnull()].index.tolist()
 for val in result:
@@ -72,11 +72,11 @@ Once the data is cleaned, exploratory data analysis can be done to get a better 
 
 ![Pair Plot](/pairplot.png)
 
-Next we can consider the distribution of regions. 
+Next, we can consider the distribution of regions. 
 
 ![Region Distribution](/region_hist.png)
 
-We can see that each country is not represented equally in the dataset. We must take this into consideration during preprocessing. For each predictor, a boxplot can give insight into the 5 number summaries of the data. 
+We can see that each country is not represented equally in the dataset. We must consideration this during preprocessing. For each predictor, a boxplot can give insight into the 5 number summaries of the data. 
 
 ![Box Plot](/boxplot.png)
 
@@ -97,7 +97,7 @@ train = pd.get_dummies(data=train,columns=['Region','Year'])
 ```
 
 ### Normalize 
-From EDA, it is known the scales and range of each predictor variable is relatively similar. For this reason, it may not be necessary to normalize the predictors before fitting a model. Normalizatoin may later be considerd when exploring models.  
+From EDA, it is known the scales and range of each predictor variable are relatively similar. For this reason, it may not be necessary to normalize the predictors before fitting a model. Normalization may later be considered when exploring models.  
 
 ## Model
 *Note: Model building took place in R*
@@ -105,17 +105,17 @@ From EDA, it is known the scales and range of each predictor variable is relativ
 To better understand what specific factors contribute to one's happiness, regression techniques can be used. 
 
 ### Full Model 
-When building a model, we will consider all variables because it is not known which varibles will best explain Happiness Score. The full model will be specified as follows:
+When building a model, we will consider all variables because it is not known which variables will best explain the Happiness Score. The full model will be specified as follows:
 ```
 fit_full <- lm(`Happiness Score` ~ ., data = train_df)
 summary(fit_full)
 ```
-This model is a good start but the data may be able to be explained with a more simplier model. Another thing we want to consider is the importance each feature plays in predicting happiness. The full model does not give us this information. 
+This model is a good start but the data may be able to be explained with a simpler model. Another thing we want to consider is the importance each feature plays in predicting happiness. The full model does not give us this information. 
 
 ### Regularization with Elastic Net
-Using regularization methods, we are able to shrink less important coefficients to (or close to) zero. This will help with feautre importance as well possibly determining a simpler model. 
+Using regularization methods, we are able to shrink less important coefficients to (or close to) zero. This will help with feature importance as well as possibly determining a simpler model. 
 
-In this case, elastic net can be used. Cross validation can be used to determine the best value for λ (the penalty constant) and α (α: [0,1] where 0 = Ridge, 1 = Lasso). Because regularization methods are being used, the data will be centered and scaled before a model is fit. Elastic net can be fit using the "car" package in R; 5 fold cross validation can be used. 
+In this case, elastic net can be used. Cross-validation can be used to determine the best value for λ (the penalty constant) and α (α: [0,1] where 0 = Ridge, 1 = Lasso). Because regularization methods are being used, the data will be centered and scaled before a model is fit. Elastic net can be fit using the "car" package in R; 5-fold cross-validation can be used. 
 ```
 set.seed(123)
 control <- trainControl(method = "cv", number = 5) # 5 fold CV
@@ -133,7 +133,7 @@ Output:
     alpha     lambda
     0.1       0.01771384
 ```
-The final model cofficients:
+The final model coefficients:
 ```
 coef(elastic_fit$finalModel, elastic_fit$bestTune$lambda)
 
@@ -158,7 +158,7 @@ Year_2016                             0.17172231
 Year_2017                            -0.02549139
 ```
 ### Model Evaluation
-To evaluate our final model we can consider the squared root of the mean squared error (RMSE). 
+To evaluate the final model we can consider the squared root of the mean squared error (RMSE). 
 ```
 #Predicted values
 test_pred_en <- predict(elastic_fit, test_df)
@@ -174,7 +174,7 @@ Output:
 
 ## Conclusion
 
-To expand on this study, other models can be evaluated and compare to model fit above. We can conclude that the most important factor (from those in this dataset) in determing one's happiness the GDP per Capita of a country. When considering region, the Latin America and Carribean region is the most important region in determing one's happiness (typically higher in comparison with other regions). 
+To expand on this study, other models can be evaluated and compared to the model fit above. We can conclude that the most important factor (from those in this dataset) in determining one's happiness is the GDP per Capita of a country. When considering region, the Latin America and Caribbean region is the most important in determining one's happiness (typically higher in comparison with other regions). 
 
 ## Relevant Links:
 - [Code](https://github.com/trey-capps/Happiness-Analysis)

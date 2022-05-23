@@ -3,7 +3,7 @@ title: "Spot-it (In Progress)"
 date: 2022-05-15
 summary: Spot new songs on Reddit based off your current Spotify playlists.
 showtoc: true
-draft: false
+draft: true
 ---
 *Note: This project has been documented on what has been completed. More information to come as I continue working!*
 
@@ -11,11 +11,11 @@ draft: false
 Do you ever get tired of being recommended the same songs over and over again while on Spotify? If yes, Reddit is a great place to find new and upcoming artists as well as popular songs. This project seeks to provide a tool for users to explore certain music subreddits with hope to spot songs they may like. This tool also will also provide the option for user to find which songs may be similar to playlist they currently have on Spotify. 
 
 ## Data Collection
-In order to collect data from Reddit, PRAW (API wrapper) can be used. All API credentials will be saved in the ```config.py``` file. A read-only Reddit instance must be made before gathering posts. Once this is completed, we can scrape post data for the last 100 posts. Becasue each music subreddit has different title formats it is difficult to create one function to extract songs from all music subreddits. While exploring a solution to this problem, an "extract song" function can be made for each subreddit. The steps for the data collection for the 'indieheads' subreddit is outlied as follows:
+In order to collect data from Reddit, PRAW (API wrapper) can be used. All API credentials will be saved in the ```config.py``` file. A read-only Reddit instance must be made before gathering posts. Once this is completed, we can scrape post data for the last 100 posts. Because each music subreddit has different title formats it is difficult to create one function to extract songs from all music subreddits. While exploring a solution to this problem, an "extract song" function can be made for each subreddit. The steps for the data collection for the 'indieheads' subreddit are outlined as follows:
 1. Setup the read-only reddit instance
 2. Specify the subreddit of interest
 3. Determine a filtering metric for posts
-    - '[FRESH]' means this post is refering to a 'fresh find' song
+    - '[FRESH]' means this post is referring to a 'fresh find' song
         - This is what we want so we can filter all new posts by this
     - A reddit link most likely not be referring to a song that is on Spotify
 4. Posts have been filtered, so the song title must be extracted. 
@@ -25,7 +25,7 @@ In order to collect data from Reddit, PRAW (API wrapper) can be used. All API cr
         - Everything after the '-' character -> Song
 5. Store each post in a .json file format 
 
-This process may not gather 100% of songs but in our case this should be fine because 'most' songs are gathered. 
+This process may not gather 100% of the songs but in our case, this should be fine because 'most' songs are gathered. 
 
 Next, since we have the artist and song name, through the Spotify API we can gather song data on these songs. The data points are:
 - Danceability 
@@ -39,7 +39,7 @@ Next, since we have the artist and song name, through the Spotify API we can gat
 - Acousticness
 
 These data points will be later used to compare songs from Reddit to the user's playlist. 
-To gather these data points for each songs, these songs can be searched in the Spotify API using ```spotipy```. Some posts from the subreddit may be from youtube or other sites. These songs might not exist on Spotify, but if they do we can extract their data. The final output will contain a json file with the songs from Reddit that exist on Spotify and the song's data points. 
+To gather these data points for each song, these songs can be searched in the Spotify API using ```spotipy```. Some posts from the subreddit maybe from youtube or other sites. These songs might not exist on Spotify, but if they do we can extract their data. The final output will contain a JSON file with the songs from Reddit that exist on Spotify and the song's data points. 
 
 The following code is for the 'indieheads' subreddit. 
 ```
@@ -104,7 +104,7 @@ def get_indieheads_data(num_post = 50):
         
     return reddit_data
 ```
-From the output of ```get_indieheads_data()``` function, this data can be added to a MongoDB to be saved for the future. 
+From the output of ```get_indieheads_data()``` function, this data can be added to MongoDB to be saved for the future. 
 
 The following function is used to upload only new posts not already in the database. 
 
@@ -138,5 +138,5 @@ def export_data(subreddit, database, num_post = 100):
 ## Next Steps
 - Refine the following code to improve and speed up the data collection process
     - Automated collection can be explored in the future
-- Create a model to find similar songs between the users playlists and the subreddit
-- Create dashboard to collect user's playlist data 
+- Create a model to find similar songs between the user's playlists and the subreddit
+- Create a dashboard to collect user playlist data 

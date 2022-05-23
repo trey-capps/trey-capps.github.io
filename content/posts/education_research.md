@@ -1,11 +1,11 @@
 ---
-title: "Does College of Student Effect Graduate Student Success?"
+title: "Does College of Study Effect Graduate Student Success?"
 date: 2022-04-25
 summary: An overview of my undergraduate research experience. 
 showtoc: true
 draft: false
 ---
-*Special thanks to those that contributed to this project as well as the mentors that provided support.* 
+*Special thanks to my research team as well as the mentors that provided support.* 
 
 ## Main Idea 
 Our project sought to identify whether graduate student success at a large research university differed by the college of study. Here, we define success as graduation with the intended degree.
@@ -26,6 +26,9 @@ We fit two logistic regression models - one for Master’s students and one for 
 The rate of student degree completion by department must be analyzed after completing the exploratory data analysis. We found that even at the college level, graduation rates differ by degree program. By degree program, we mean whether the student is pursuing a Master’s Degree (MS, MA, MR, etc) or a Doctorate (Ph.D., EDD). Across all colleges, Master’s students have an average graduation rate of approximately 86%, whereas doctoral students have an average graduation rate of approximately 65%. These values are averages and do not capture the variability of graduation rates between different colleges.
 
 After creating our logistic regression models, our main takeaway is that college of study is a significant factor in the probability of graduation, even when controlling for other potentially confounding variables [Wald’s Chi-Square = 308 (Master’s) and 38 (Ph.D.); p-value for both < 0.0001]. In order to expand upon our results, a next step would be to look into colleges with lower success rates and explore ways to improve the success rates of those colleges. Future research is necessary to validate these findings and improve specificity, such as studying the student’s department instead of just their college. 
+
+## Presentation
+![Research Poster](/final_poster.png)
 
 ## References
 
