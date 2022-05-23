@@ -6,7 +6,7 @@ summary:
   This section is about me.
 ---
 
-I graduated from North Carolina State University in May 2022 with a Bachelor's of Science in Statistics and a minor in Mathematics. 
-I am currently seeking full-time positions in the field of data science and data analytics. Apart from data science, I enjoy hiking, music, and playing golf. 
+I graduated from North Carolina State University in May 2022 with a Bachelor of Science in Statistics and a minor in Mathematics. 
+I am currently seeking full-time positions in data science and data analytics. Apart from data science, I enjoy hiking, music, and playing golf. 
 
-To talk about data science, golf, or any other inquires feel free to message me on Linkedin or reach out via email.
+To talk about data science, golf, or any other inquiries, feel free to message me on Linkedin or reach out through email.
