@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Happiness Analysis | Trey Capps</title>
+<meta name="keywords" content="">
+<meta name="description" content="Regression techniques to determine what factors contribute to one&rsquo;s happiness.">
+<meta name="author" content="">
+<link rel="canonical" href="https://trey-capps.github.io/posts/happiness_analysis/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2840b7fccd34145847db71a290569594bdbdb00047097f75d6495d162f5d7dff.js" integrity="sha256-KEC3/M00FFhH23GikFaVlL29sABHCX911kldFi9dff8="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://trey-capps.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://trey-capps.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://trey-capps.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://trey-capps.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://trey-capps.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Happiness Analysis" />
+<meta property="og:description" content="Regression techniques to determine what factors contribute to one&rsquo;s happiness." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://trey-capps.github.io/posts/happiness_analysis/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-08-15T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-08-15T00:00:00&#43;00:00" /><meta property="og:site_name" content="Trey Capps" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Happiness Analysis"/>
+<meta name="twitter:description" content="Regression techniques to determine what factors contribute to one&rsquo;s happiness."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Posts",
+      "item": "https://trey-capps.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Happiness Analysis",
+      "item": "https://trey-capps.github.io/posts/happiness_analysis/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Happiness Analysis",
+  "name": "Happiness Analysis",
+  "description": "Regression techniques to determine what factors contribute to one\u0026rsquo;s happiness.",
+  "keywords": [
+    
+  ],
+  "articleBody": "Overview Questions of interest:\n What are the most important factors contributing to a person’s happiness? Do any specific regions to to be happier than others?  This project was based off Kaggle’s World Happiness Report Dataset found here.\nTo supplement this analysis a Tableau Dashboard was created to help visualize region and country happiness for each year.\nExplore Data Load Data Kaggle provides csv files for the years 2015 to 2019. Pandas can be used to load each years csv.\n2015 example below:\ndf15 = pd.read_csv('2015.csv') Cleaning Once the datasets have been loaded, it appears the data structure is different for 2017, 2018, and 2019. Any dataset specific varibale creation can be done before merging all datasets. For years 2017 to 2019, the ‘Region’ column has not been given. This will be important for visualizations and may be considered for the model. We can use the Country-Region pairs from 2015 to see if we can impute this column. A simple function was made:\nregion = df15.set_index('Country').to_dict()['Region'] def find_region(df): try: df['Region'] = region[df['Country']] except KeyError: df['Region'] = np.nan return df This function can be applied to 2017, 2018, and 2019 dataframes.\n2017 Example:\ndf17 = df17.apply(find_region, axis = 1) To determine the results of our imputation, we can consdier how many NaN values are in the ‘Region’ column.\nprint(df17.isna().sum()) There are 6 missing ‘Region’ values. The datasets will be merged and then these missing regions will be filled.\nCombine Datasets The datasets can now be concatenated.\nframes = [df15, df16, df17, df18, df19] df_all = pd.concat(frames) It is important for this analysis to not drop the rows with a missing ‘Region’ column. Because there is only 19 missing values, these regions will be manually inputed (Chances are they are similar across 2017, 2018, and 2019). To determine which countires are misisng a region we can loop through each country.\nresult = df_all[df_all['Region'].isnull()].index.tolist() for val in result: countries = df_all.iloc[val]['Country'] countries = countries.splitlines() addition = {key: None for key in countries} print(addition) The values in the addition dictionary can be filled and then added to corresponding rows in the combined dataset.\nWhen considering the missing values in numeric columns, there only appears to be one for the ‘Trust’ column for 2018. From the plot below it appears, given the missing row was rank 20, the mean for the entire year is the best imputation.\nEDA Once the data is cleaned, exploratory data analysis can be done to get a better understanding of the data. A pairs plot can be created to get an idea of the distribution of each variable and inspect multicollinearity.\nInsert plot here\nNext we can consider the distribution of regions.\ninsert region hist here\nWe can see that each country is not represented equally in the dataset. We must take this into consideration during preprocessing. For each predictor, a boxplot can give insight into the 5 number summaries of the data.\ninsert boxplots here\nPreprocess From EDA, there are a few preprocessing steps that must be done before exploring models. Three preprocessing steps were considered in this analysis.\nStratify Split When creating a train and test set it is important the stratify on Region because the frequencies are not equal across all Regions.\ntrain, test = train_test_split(happy_df, test_size=0.25, stratify=happy_df['Region']) This will allow a model to be trained on a dataset that is more representative.\nOne Hot Encode The two categorical variables, Region and Year, must be encoded.\ntrain = pd.get_dummies(data=train,columns=['Region','Year']) Normalize From EDA, it is known the scales and range of each predictor variable is relatively similar. For this reason, it may not be necessary to normalize the predictors before fitting a model. Normalizatoin may later be considerd when exploring models.\nModel Note: Model building took place in R\nTo better understand what specific factors contribute to one’s happiness, regression techniques can be used.\nFull Model When building a model, we will consider all variables because it is not known which varibles will best explain Happiness Score. The full model will be specified as follows:\nfit_full This model is a good start but the data may be able to be explained with a more simplier model. Another thing we want to consider is the importance each feature plays in predicting happiness. The full model does not give us this information.\nRegularization with Elastic Net Using regularization methods, we are able to shrink less important coefficients to (or close to) zero. This will help with feautre importance as well possibly determining a simpler model.\nIn this case, elastic net can be used. Cross validation can be used to determine the best value for λ (the penalty constant) and α (α: [0,1] where 0 = Ridge, 1 = Lasso). Because regularization methods are being used, the data will be centered and scaled before a model is fit. Elastic net can be fit using the “car” package in R; 5 fold cross validation can be used.\nset.seed(123) control To determine our optimal parameters:\nelastic_fit$bestTune Output: alpha lambda 0.1 0.01771384 The final model cofficients:\ncoef(elastic_fit$finalModel, elastic_fit$bestTune$lambda) Output: s1 (Intercept) 5.39134812 `Economy (GDP per Capita)` 0.40820405 Family 0.31910350 `Health (Life Expectancy)` 0.18009433 Freedom 0.17677472 `Trust (Government Corruption)` 0.10875080 Generosity 0.08688597 `Region_Australia and New Zealand` 0.03449934 `Region_Central and Eastern Europe` . `Region_Latin America and Caribbean` 0.17692684 `Region_North America` 0.05179696 `Region_Southeastern Asia` -0.07451232 `Region_Sub-Saharan Africa` -0.06211095 Year_2015 0.09169874 Year_2016 0.17172231 Year_2017 -0.02549139 Model Evaluation To evaluate our final model we can consider the squared root of the mean squared error (RMSE).\n#Predicted values test_pred_en Conclusion To expand on this study, other models can be evaluated and compare to model fit above. We can conclude that the most important factor (from those in this dataset) in determing one’s happiness the GDP per Capita of a country. When considering region, the Latin America and Carribean region is the most important region in determing one’s happiness (typically higher in comparison with other regions).\nRelevant Links:  Code Tableau Dashboard  ",
+  "wordCount" : "1042",
+  "inLanguage": "en",
+  "datePublished": "2021-08-15T00:00:00Z",
+  "dateModified": "2021-08-15T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://trey-capps.github.io/posts/happiness_analysis/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Trey Capps",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://trey-capps.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://trey-capps.github.io" accesskey="h" title="Trey Capps (Alt + H)">Trey Capps</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://trey-capps.github.io/about" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://trey-capps.github.io/posts" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://trey-capps.github.io">Home</a>&nbsp;»&nbsp;<a href="https://trey-capps.github.io/posts/">Posts</a></div>
+    <h1 class="post-title">
+      Happiness Analysis
+    </h1>
+    <div class="post-meta"><span title='2021-08-15 00:00:00 +0000 UTC'>August 15, 2021</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#overview" aria-label="Overview">Overview</a></li>
+                <li>
+                    <a href="#explore-data" aria-label="Explore Data">Explore Data</a><ul>
+                        
+                <li>
+                    <a href="#load-data" aria-label="Load Data">Load Data</a></li>
+                <li>
+                    <a href="#cleaning" aria-label="Cleaning">Cleaning</a></li>
+                <li>
+                    <a href="#combine-datasets" aria-label="Combine Datasets">Combine Datasets</a></li>
+                <li>
+                    <a href="#eda" aria-label="EDA">EDA</a></li></ul>
+                </li>
+                <li>
+                    <a href="#preprocess" aria-label="Preprocess">Preprocess</a><ul>
+                        
+                <li>
+                    <a href="#stratify-split" aria-label="Stratify Split">Stratify Split</a></li>
+                <li>
+                    <a href="#one-hot-encode" aria-label="One Hot Encode">One Hot Encode</a></li>
+                <li>
+                    <a href="#normalize" aria-label="Normalize">Normalize</a></li></ul>
+                </li>
+                <li>
+                    <a href="#model" aria-label="Model">Model</a><ul>
+                        
+                <li>
+                    <a href="#full-model" aria-label="Full Model">Full Model</a></li>
+                <li>
+                    <a href="#regularization-with-elastic-net" aria-label="Regularization with Elastic Net">Regularization with Elastic Net</a></li>
+                <li>
+                    <a href="#model-evaluation" aria-label="Model Evaluation">Model Evaluation</a></li></ul>
+                </li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a></li>
+                <li>
+                    <a href="#relevant-links" aria-label="Relevant Links:">Relevant Links:</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h2>
+<p>Questions of interest:</p>
+<ul>
+<li>What are the most important factors contributing to a person&rsquo;s happiness?</li>
+<li>Do any specific regions to to be happier than others?</li>
+</ul>
+<p>This project was based off Kaggle&rsquo;s World Happiness Report Dataset found <a href="https://www.kaggle.com/datasets/unsdsn/world-happiness">here</a>.</p>
+<p><em>To supplement this analysis a <a href="https://public.tableau.com/app/profile/trey.capps/viz/HappinessAnalysis_16267395880800/Dashboard1">Tableau Dashboard</a> was created to help visualize region and country happiness for each year.</em></p>
+<h2 id="explore-data">Explore Data<a hidden class="anchor" aria-hidden="true" href="#explore-data">#</a></h2>
+<h3 id="load-data">Load Data<a hidden class="anchor" aria-hidden="true" href="#load-data">#</a></h3>
+<p>Kaggle provides csv files for the years 2015 to 2019. Pandas can be used to load each years csv.</p>
+<p>2015 example below:</p>
+<pre tabindex="0"><code>df15 = pd.read_csv(&#39;2015.csv&#39;)
+</code></pre><h3 id="cleaning">Cleaning<a hidden class="anchor" aria-hidden="true" href="#cleaning">#</a></h3>
+<p>Once the datasets have been loaded, it appears the data structure is different for 2017, 2018, and 2019. Any dataset specific varibale creation can be done before merging all datasets. For years 2017 to 2019, the &lsquo;Region&rsquo; column has not been given. This will be important for visualizations and may be considered for the model. We can use the Country-Region pairs from 2015 to see if we can impute this column. A simple function was made:</p>
+<pre tabindex="0"><code>region = df15.set_index(&#39;Country&#39;).to_dict()[&#39;Region&#39;]
+def find_region(df):    
+    try:
+        df[&#39;Region&#39;] = region[df[&#39;Country&#39;]]
+    except KeyError:
+        df[&#39;Region&#39;] = np.nan
+    
+    return df
+</code></pre><p>This function can be applied to 2017, 2018, and 2019 dataframes.</p>
+<p>2017 Example:</p>
+<pre tabindex="0"><code>df17 = df17.apply(find_region, axis = 1)
+</code></pre><p>To determine the results of our imputation, we can consdier how many NaN values are in the &lsquo;Region&rsquo; column.</p>
+<pre tabindex="0"><code>print(df17.isna().sum())
+</code></pre><p>There are 6 missing &lsquo;Region&rsquo; values. The datasets will be merged and then these missing regions will be filled.</p>
+<h3 id="combine-datasets">Combine Datasets<a hidden class="anchor" aria-hidden="true" href="#combine-datasets">#</a></h3>
+<p>The datasets can now be concatenated.</p>
+<pre tabindex="0"><code>frames = [df15, df16, df17, df18, df19]
+df_all = pd.concat(frames)
+</code></pre><p>It is important for this analysis to not drop the rows with a missing &lsquo;Region&rsquo; column. Because there is only 19 missing values, these regions will be manually inputed (Chances are they are similar across 2017, 2018, and 2019). To determine which countires are misisng a region we can loop through each country.</p>
+<pre tabindex="0"><code>result = df_all[df_all[&#39;Region&#39;].isnull()].index.tolist()
+for val in result:
+    countries = df_all.iloc[val][&#39;Country&#39;]
+    countries = countries.splitlines()
+    addition = {key: None for key in countries}
+    print(addition)
+</code></pre><p>The values in the <code>addition</code> dictionary can be filled and then added to corresponding rows in the combined dataset.</p>
+<p>When considering the missing values in numeric columns, there only appears to be one for the &lsquo;Trust&rsquo; column for 2018. From the plot below it appears, given the missing row was rank 20, the mean for the entire year is the best imputation.</p>
+<p><img loading="lazy" src="https://trey-capps.github.io/static/mean_impute.png" alt="Mean Imputation Plot"  />
+</p>
+<h3 id="eda">EDA<a hidden class="anchor" aria-hidden="true" href="#eda">#</a></h3>
+<p>Once the data is cleaned, exploratory data analysis can be done to get a better understanding of the data. A pairs plot can be created to get an idea of the distribution of each variable and inspect multicollinearity.</p>
+<p><em>Insert plot here</em></p>
+<p>Next we can consider the distribution of regions.</p>
+<p><em>insert region hist here</em></p>
+<p>We can see that each country is not represented equally in the dataset. We must take this into consideration during preprocessing. For each predictor, a boxplot can give insight into the 5 number summaries of the data.</p>
+<p><em>insert boxplots here</em></p>
+<h2 id="preprocess">Preprocess<a hidden class="anchor" aria-hidden="true" href="#preprocess">#</a></h2>
+<p>From EDA, there are a few preprocessing steps that must be done before exploring models. Three preprocessing steps were considered in this analysis.</p>
+<h3 id="stratify-split">Stratify Split<a hidden class="anchor" aria-hidden="true" href="#stratify-split">#</a></h3>
+<p>When creating a train and test set it is important the stratify on Region because the frequencies are not equal across all Regions.</p>
+<pre tabindex="0"><code>train, test = train_test_split(happy_df, test_size=0.25, stratify=happy_df[&#39;Region&#39;])
+</code></pre><p>This will allow a model to be trained on a dataset that is more representative.</p>
+<h3 id="one-hot-encode">One Hot Encode<a hidden class="anchor" aria-hidden="true" href="#one-hot-encode">#</a></h3>
+<p>The two categorical variables, Region and Year, must be encoded.</p>
+<pre tabindex="0"><code>train = pd.get_dummies(data=train,columns=[&#39;Region&#39;,&#39;Year&#39;])
+</code></pre><h3 id="normalize">Normalize<a hidden class="anchor" aria-hidden="true" href="#normalize">#</a></h3>
+<p>From EDA, it is known the scales and range of each predictor variable is relatively similar. For this reason, it may not be necessary to normalize the predictors before fitting a model. Normalizatoin may later be considerd when exploring models.</p>
+<h2 id="model">Model<a hidden class="anchor" aria-hidden="true" href="#model">#</a></h2>
+<p><em>Note: Model building took place in R</em></p>
+<p>To better understand what specific factors contribute to one&rsquo;s happiness, regression techniques can be used.</p>
+<h3 id="full-model">Full Model<a hidden class="anchor" aria-hidden="true" href="#full-model">#</a></h3>
+<p>When building a model, we will consider all variables because it is not known which varibles will best explain Happiness Score. The full model will be specified as follows:</p>
+<pre tabindex="0"><code>fit_full &lt;- lm(`Happiness Score` ~ ., data = train_df)
+summary(fit_full)
+</code></pre><p>This model is a good start but the data may be able to be explained with a more simplier model. Another thing we want to consider is the importance each feature plays in predicting happiness. The full model does not give us this information.</p>
+<h3 id="regularization-with-elastic-net">Regularization with Elastic Net<a hidden class="anchor" aria-hidden="true" href="#regularization-with-elastic-net">#</a></h3>
+<p>Using regularization methods, we are able to shrink less important coefficients to (or close to) zero. This will help with feautre importance as well possibly determining a simpler model.</p>
+<p>In this case, elastic net can be used. Cross validation can be used to determine the best value for λ (the penalty constant) and α (α: [0,1] where 0 = Ridge, 1 = Lasso). Because regularization methods are being used, the data will be centered and scaled before a model is fit. Elastic net can be fit using the &ldquo;car&rdquo; package in R; 5 fold cross validation can be used.</p>
+<pre tabindex="0"><code>set.seed(123)
+control &lt;- trainControl(method = &#34;cv&#34;, number = 5) # 5 fold CV
+elastic_fit &lt;- train(`Happiness Score` ~ ., 
+                data = selected_vars,
+                method = &#34;glmnet&#34;, #specify elastic net
+                preProcess = c(&#34;center&#34;, &#34;scale&#34;), #Preprocess: center and scale
+                trControl = control)
+</code></pre><p>To determine our optimal parameters:</p>
+<pre tabindex="0"><code>elastic_fit$bestTune
+
+Output:
+    alpha     lambda
+    0.1       0.01771384
+</code></pre><p>The final model cofficients:</p>
+<pre tabindex="0"><code>coef(elastic_fit$finalModel, elastic_fit$bestTune$lambda)
+
+Output:
+
+                                              s1
+(Intercept)                           5.39134812
+`Economy (GDP per Capita)`            0.40820405
+Family                                0.31910350
+`Health (Life Expectancy)`            0.18009433
+Freedom                               0.17677472
+`Trust (Government Corruption)`       0.10875080
+Generosity                            0.08688597
+`Region_Australia and New Zealand`    0.03449934
+`Region_Central and Eastern Europe`   .         
+`Region_Latin America and Caribbean`  0.17692684
+`Region_North America`                0.05179696
+`Region_Southeastern Asia`           -0.07451232
+`Region_Sub-Saharan Africa`          -0.06211095
+Year_2015                             0.09169874
+Year_2016                             0.17172231
+Year_2017                            -0.02549139
+</code></pre><h3 id="model-evaluation">Model Evaluation<a hidden class="anchor" aria-hidden="true" href="#model-evaluation">#</a></h3>
+<p>To evaluate our final model we can consider the squared root of the mean squared error (RMSE).</p>
+<pre tabindex="0"><code>#Predicted values
+test_pred_en &lt;- predict(elastic_fit, test_df)
+#Actual values
+test_act_en &lt;- test_df$`Happiness Score`
+#RMSE
+rmse_en &lt;- RMSE(test_act_en, test_pred_en)
+rmse_en
+
+Output:
+0.527372
+</code></pre><h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>To expand on this study, other models can be evaluated and compare to model fit above. We can conclude that the most important factor (from those in this dataset) in determing one&rsquo;s happiness the GDP per Capita of a country. When considering region, the Latin America and Carribean region is the most important region in determing one&rsquo;s happiness (typically higher in comparison with other regions).</p>
+<h2 id="relevant-links">Relevant Links:<a hidden class="anchor" aria-hidden="true" href="#relevant-links">#</a></h2>
+<ul>
+<li><a href="https://github.com/trey-capps/Happiness-Analysis">Code</a></li>
+<li><a href="https://public.tableau.com/app/profile/trey.capps/viz/HappinessAnalysis_16267395880800/Dashboard1">Tableau Dashboard</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2022 <a href="https://trey-capps.github.io">Trey Capps</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

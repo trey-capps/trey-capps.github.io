@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Patient Saftey - Dexcom Continuous Glucose Monitor | Trey Capps</title>
+<meta name="keywords" content="">
+<meta name="description" content="Unsupervised learning to improve patient saftey involving Dexcom&rsquo;s continuous glucose monitors.">
+<meta name="author" content="">
+<link rel="canonical" href="https://trey-capps.github.io/posts/patient_saftey/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2840b7fccd34145847db71a290569594bdbdb00047097f75d6495d162f5d7dff.js" integrity="sha256-KEC3/M00FFhH23GikFaVlL29sABHCX911kldFi9dff8="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://trey-capps.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://trey-capps.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://trey-capps.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://trey-capps.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://trey-capps.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Patient Saftey - Dexcom Continuous Glucose Monitor" />
+<meta property="og:description" content="Unsupervised learning to improve patient saftey involving Dexcom&rsquo;s continuous glucose monitors." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://trey-capps.github.io/posts/patient_saftey/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-11-30T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-11-30T00:00:00&#43;00:00" /><meta property="og:site_name" content="Trey Capps" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Patient Saftey - Dexcom Continuous Glucose Monitor"/>
+<meta name="twitter:description" content="Unsupervised learning to improve patient saftey involving Dexcom&rsquo;s continuous glucose monitors."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Posts",
+      "item": "https://trey-capps.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Patient Saftey - Dexcom Continuous Glucose Monitor",
+      "item": "https://trey-capps.github.io/posts/patient_saftey/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Patient Saftey - Dexcom Continuous Glucose Monitor",
+  "name": "Patient Saftey - Dexcom Continuous Glucose Monitor",
+  "description": "Unsupervised learning to improve patient saftey involving Dexcom\u0026rsquo;s continuous glucose monitors.",
+  "keywords": [
+    
+  ],
+  "articleBody": "Overview Every year, the US Food and Drug Administration (FDA) recieves a large number of medical device reports, many of which cause serious injury or death. When considering what specific devices were creating the most reports, continuous glucose monitors (CGM) were the second most reported. CGMs are an important device when it comes to tracking blood glucose levels in diabetic patients. In order part in these patient’s saftey is ensuring these devices work properly and device malfunctions must be identified. Due to the amount of reports the FDA recieves it is tough to physically consider every report.\nThrough the use of unsupervised learning, key topics can be extracted from the entire database of reports. This will allow each report to be classified based on an overarching topic which can drastically speed up the human review process.\nData Data Collection The entire database for this analysis can be here. The text data was collected by the FDA through the device report form. Data was only used for the years 2016 to 2021 and only considered Dexom CGM devices (G4, G5, and G6). This resulted in a dataset containing 15,780,419 device reports relating to the Dexcom CGM. This dataset was then loaded into python using pandas.\nData Cleaning After some exploration of the dataset, there are two categories of reports. One contains information about the original problem or event and the second contains updates to this original report case. Only the original report cases will be considered.\nFrom external research, it was also determined the Dexcom G4 and Dexcom G5 devices were discontinued by the end of 2020. We will only consider G6 devices assuming updates to the older models is not taking place anymore.\nPreprocessing A large part of topic modeling is ensuring the data is properly preprocessed. The following steps outline the preprocessing process taken for this analysis.\nUnify Strings We can use regular expressions to remove any characters that are not in A-Z, a-z, or 0-9. These characters do not provide any value when extracting topics. All text will be converted to lowercase to provide similariy across all reports.\nTokenize Next, tokenization can be used to break every word down into its own string. This step is important so the model’s output will be a group of words for each topic.\nStop Words Next, since we tokenized to words, stop words must be removed. The general ’english’ stopwords that is provided in the NLTK package was used. This list was also extended to add more stopwords that were frequently appearing in the dataset but did not provide much value.\nLemmatization Next, the WordNetLemmitizer() from the NLTK package, was used to lemmitize each token. Lemmitization was chosen over stemming to help when interpreting topics.\nTerm Frequency - Inverse Document Frequency (TF-IDF) The final preprocessing step is creating a term-document matrix. TF-IDF will convert text into frequencies representing how relevant certain words are in the device reports. This will provide a numeric summary which is what is need for topic modeling. TfidVectorizer() from the scikit-learn package can be used to create the TF-IDF vector.\nTopic Modeling For topic modeling, two techniques will be explored and the results will be evaluated based on the interpretability of the results (extracted topics). Due to limited computational power provided for this project, the max number of topics explored will be 10.\nNon-Negative Matrix Factorization (NMF) NMF is a linear algebra based, dimensionality reduction technique thae will split the document-term matrix into a document-topic matrix and a topic-term matrix. Latent Semantic Analysis (LSA) was also explored but provided similar results to NMF. Becasue NMF produced striclty positive results is was chosen over LSA.\nExtracted Topics After explore 2-10 topics, 3 appeared to give the most disticnt and interpretable topics. The following table shows the top 10 most common words in each of the 3 topics:\n   Topic Number Top 10 Words     Topic 1 ‘reported’, ’transmitter’, ‘failed’, ’error’, ‘data’, ‘injury’, ‘intervention’, ‘medical’, ‘allegation’, ‘occurred’   Topic 2 ’loss’, ‘signal’, ‘performed’, ‘one’, ‘hour’, ‘within’, ‘window’, ‘share’, ‘investigation’, ’log’   Topic 3 ‘reading’, ‘glucose’, ‘bg’, ‘meter’, ’event’, ‘customer’, ‘patient’, ‘additional’, ‘information’, ‘available’    Example Case Now consider how the first report case is classified.\n   Document (Report Case) 1 - Preprocessed     dexcom made aware inaccuracy continuous glucose monitor blood glucose meter sensor inserted hip data provided evaluation complaint confirmation probable cause could not determined labeling indicates patient use belly abdomen patient year old choose upper buttock look place belly upper buttock padding sensor not tested approved site talk hcp best site additional event patient information available    Result    Topic Number Result     Topic 1 0.002   Topic 2 0.000   Topic 3 0.028    From the results the most similar topic to the first report case is topic 3. From our topics and result, NMF appears to be a good technique that is rather computationally inexpensive.\nLatent Dirichlet Allocation (LDA) A more computationally expensive technique can be used to possibly improve topic coherence.\nIn simple terms, LDA considers:\n Documents are made up of a mix of topics. For each document a probability will be assigned to each topic. Topics are made up of a mix of words. Words can overlap between different topics.  Result Because LDA is a iterative algorithm, due to the limited computational power for this project, LDA could not be explored to it’s full potential. Topics were extracted for 2 and 3 topics. This problem could be solved in the future by possibly fitting LDA in chunks.\nPost Topic Analysis From the topics extracted using NMF, the table below will define what each topics theme is.\n   Topic Number Overall Theme     Topic 1 Reports relating to the devices transmitter   Topic 2 Reports relating to the devices signal (loss)   Topic 3 Reports relating to the devices glucose readings    After all device reports cases are given a topic the following plots can provide insight into when certain issues came about.\nInsert all plots here\nadd interpretations\nLink To Code\n",
+  "wordCount" : "980",
+  "inLanguage": "en",
+  "datePublished": "2021-11-30T00:00:00Z",
+  "dateModified": "2021-11-30T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://trey-capps.github.io/posts/patient_saftey/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Trey Capps",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://trey-capps.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://trey-capps.github.io" accesskey="h" title="Trey Capps (Alt + H)">Trey Capps</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://trey-capps.github.io/about" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://trey-capps.github.io/posts" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://trey-capps.github.io">Home</a>&nbsp;»&nbsp;<a href="https://trey-capps.github.io/posts/">Posts</a></div>
+    <h1 class="post-title">
+      Patient Saftey - Dexcom Continuous Glucose Monitor
+    </h1>
+    <div class="post-meta"><span title='2021-11-30 00:00:00 +0000 UTC'>November 30, 2021</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#overview" aria-label="Overview">Overview</a></li>
+                <li>
+                    <a href="#data" aria-label="Data">Data</a><ul>
+                        
+                <li>
+                    <a href="#data-collection" aria-label="Data Collection">Data Collection</a></li>
+                <li>
+                    <a href="#data-cleaning" aria-label="Data Cleaning">Data Cleaning</a></li></ul>
+                </li>
+                <li>
+                    <a href="#preprocessing" aria-label="Preprocessing">Preprocessing</a><ul>
+                        
+                <li>
+                    <a href="#unify-strings" aria-label="Unify Strings">Unify Strings</a></li>
+                <li>
+                    <a href="#tokenize" aria-label="Tokenize">Tokenize</a></li>
+                <li>
+                    <a href="#stop-words" aria-label="Stop Words">Stop Words</a></li>
+                <li>
+                    <a href="#lemmatization" aria-label="Lemmatization">Lemmatization</a></li>
+                <li>
+                    <a href="#term-frequency---inverse-document-frequency-tf-idf" aria-label="Term Frequency - Inverse Document Frequency (TF-IDF)">Term Frequency - Inverse Document Frequency (TF-IDF)</a></li></ul>
+                </li>
+                <li>
+                    <a href="#topic-modeling" aria-label="Topic Modeling">Topic Modeling</a><ul>
+                        
+                <li>
+                    <a href="#non-negative-matrix-factorization-nmf" aria-label="Non-Negative Matrix Factorization (NMF)">Non-Negative Matrix Factorization (NMF)</a><ul>
+                        
+                <li>
+                    <a href="#extracted-topics" aria-label="Extracted Topics">Extracted Topics</a></li>
+                <li>
+                    <a href="#example-case" aria-label="Example Case">Example Case</a><ul>
+                        
+                <li>
+                    <a href="#result" aria-label="Result">Result</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#latent-dirichlet-allocation-lda" aria-label="Latent Dirichlet Allocation (LDA)">Latent Dirichlet Allocation (LDA)</a><ul>
+                        
+                <li>
+                    <a href="#result-1" aria-label="Result">Result</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#post-topic-analysis" aria-label="Post Topic Analysis">Post Topic Analysis</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h2>
+<p>Every year, the US Food and Drug Administration (FDA) recieves a large number of medical device reports, many of which cause serious injury or death. When considering what specific devices were creating the most reports, continuous glucose monitors (CGM) were the second most reported. CGMs are an important device when it comes to tracking blood glucose levels in diabetic patients. In order part in these patient&rsquo;s saftey is ensuring these devices work properly and device malfunctions must be identified. Due to the amount of reports the FDA recieves it is tough to physically consider every report.</p>
+<p>Through the use of unsupervised learning, key topics can be extracted from the entire database of reports. This will allow each report to be classified based on an overarching topic which can drastically speed up the human review process.</p>
+<h2 id="data">Data<a hidden class="anchor" aria-hidden="true" href="#data">#</a></h2>
+<h3 id="data-collection">Data Collection<a hidden class="anchor" aria-hidden="true" href="#data-collection">#</a></h3>
+<p>The entire database for this analysis can be <a href="https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfmaude/search.cfm">here</a>. The text data was collected by the FDA through the <a href="https://www.fda.gov/media/76299/download">device report form</a>. Data was only used for the years 2016 to 2021 and only considered Dexom CGM devices (G4, G5, and G6). This resulted in a dataset containing 15,780,419 device reports relating to the Dexcom CGM. This dataset was then loaded into python using pandas.</p>
+<h3 id="data-cleaning">Data Cleaning<a hidden class="anchor" aria-hidden="true" href="#data-cleaning">#</a></h3>
+<p>After some exploration of the dataset, there are two categories of reports. One contains information about the original problem or event and the second contains updates to this original report case. Only the original report cases will be considered.</p>
+<p>From external research, it was also determined the Dexcom G4 and Dexcom G5 devices were discontinued by the end of 2020. We will only consider G6 devices assuming updates to the older models is not taking place anymore.</p>
+<h2 id="preprocessing">Preprocessing<a hidden class="anchor" aria-hidden="true" href="#preprocessing">#</a></h2>
+<p>A large part of topic modeling is ensuring the data is properly preprocessed. The following steps outline the preprocessing process taken for this analysis.</p>
+<h3 id="unify-strings">Unify Strings<a hidden class="anchor" aria-hidden="true" href="#unify-strings">#</a></h3>
+<p>We can use regular expressions to remove any characters that are not in A-Z, a-z, or 0-9. These characters do not provide any value when extracting topics. All text will be converted to lowercase to provide similariy across all reports.</p>
+<h3 id="tokenize">Tokenize<a hidden class="anchor" aria-hidden="true" href="#tokenize">#</a></h3>
+<p>Next, tokenization can be used to break every word down into its own string. This step is important so the model&rsquo;s output will be a group of words for each topic.</p>
+<h3 id="stop-words">Stop Words<a hidden class="anchor" aria-hidden="true" href="#stop-words">#</a></h3>
+<p>Next, since we tokenized to words, stop words must be removed. The general &rsquo;english&rsquo; stopwords that is provided in the <code>NLTK</code> package was used. This list was also extended to add more stopwords that were frequently appearing in the dataset but did not provide much value.</p>
+<h3 id="lemmatization">Lemmatization<a hidden class="anchor" aria-hidden="true" href="#lemmatization">#</a></h3>
+<p>Next, the <code>WordNetLemmitizer()</code> from the <code>NLTK</code> package, was used to lemmitize each token. Lemmitization was chosen over stemming to help when interpreting topics.</p>
+<h3 id="term-frequency---inverse-document-frequency-tf-idf">Term Frequency - Inverse Document Frequency (TF-IDF)<a hidden class="anchor" aria-hidden="true" href="#term-frequency---inverse-document-frequency-tf-idf">#</a></h3>
+<p>The final preprocessing step is creating a term-document matrix. TF-IDF will convert text into frequencies representing how relevant certain words are in the device reports. This will provide a numeric summary which is what is need for topic modeling. <code>TfidVectorizer()</code> from the <code>scikit-learn</code> package can be used to create the TF-IDF vector.</p>
+<h2 id="topic-modeling">Topic Modeling<a hidden class="anchor" aria-hidden="true" href="#topic-modeling">#</a></h2>
+<p>For topic modeling, two techniques will be explored and the results will be evaluated based on the interpretability of the results (extracted topics). Due to limited computational power provided for this project, the max number of topics explored will be 10.</p>
+<h3 id="non-negative-matrix-factorization-nmf">Non-Negative Matrix Factorization (NMF)<a hidden class="anchor" aria-hidden="true" href="#non-negative-matrix-factorization-nmf">#</a></h3>
+<p>NMF is a linear algebra based, dimensionality reduction technique thae will split the document-term matrix into a document-topic matrix and a topic-term matrix. Latent Semantic Analysis (LSA) was also explored but provided similar results to NMF. Becasue NMF produced striclty positive results is was chosen over LSA.</p>
+<h4 id="extracted-topics">Extracted Topics<a hidden class="anchor" aria-hidden="true" href="#extracted-topics">#</a></h4>
+<p>After explore 2-10 topics, 3 appeared to give the most disticnt and interpretable topics. The following table shows the top 10 most common words in each of the 3 topics:</p>
+<table>
+<thead>
+<tr>
+<th>Topic Number</th>
+<th>Top 10 Words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Topic 1</td>
+<td>&lsquo;reported&rsquo;, &rsquo;transmitter&rsquo;, &lsquo;failed&rsquo;, &rsquo;error&rsquo;, &lsquo;data&rsquo;, &lsquo;injury&rsquo;, &lsquo;intervention&rsquo;, &lsquo;medical&rsquo;, &lsquo;allegation&rsquo;, &lsquo;occurred&rsquo;</td>
+</tr>
+<tr>
+<td>Topic 2</td>
+<td>&rsquo;loss&rsquo;, &lsquo;signal&rsquo;, &lsquo;performed&rsquo;, &lsquo;one&rsquo;, &lsquo;hour&rsquo;, &lsquo;within&rsquo;, &lsquo;window&rsquo;, &lsquo;share&rsquo;, &lsquo;investigation&rsquo;, &rsquo;log&rsquo;</td>
+</tr>
+<tr>
+<td>Topic 3</td>
+<td>&lsquo;reading&rsquo;, &lsquo;glucose&rsquo;, &lsquo;bg&rsquo;, &lsquo;meter&rsquo;, &rsquo;event&rsquo;, &lsquo;customer&rsquo;, &lsquo;patient&rsquo;, &lsquo;additional&rsquo;, &lsquo;information&rsquo;, &lsquo;available&rsquo;</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-case">Example Case<a hidden class="anchor" aria-hidden="true" href="#example-case">#</a></h4>
+<p>Now consider how the first report case is classified.</p>
+<table>
+<thead>
+<tr>
+<th>Document (Report Case) 1 - Preprocessed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dexcom made aware inaccuracy continuous glucose monitor blood glucose meter sensor inserted hip data provided evaluation complaint confirmation probable cause could not determined labeling indicates patient use belly abdomen patient year old choose upper buttock look place belly upper buttock padding sensor not tested approved site talk hcp best site additional event patient information available</td>
+</tr>
+</tbody>
+</table>
+<h5 id="result">Result<a hidden class="anchor" aria-hidden="true" href="#result">#</a></h5>
+<table>
+<thead>
+<tr>
+<th>Topic Number</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Topic 1</td>
+<td>0.002</td>
+</tr>
+<tr>
+<td>Topic 2</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>Topic 3</td>
+<td>0.028</td>
+</tr>
+</tbody>
+</table>
+<p>From the results the most similar topic to the first report case is topic 3. From our topics and result, NMF appears to be a good technique that is rather computationally inexpensive.</p>
+<h3 id="latent-dirichlet-allocation-lda">Latent Dirichlet Allocation (LDA)<a hidden class="anchor" aria-hidden="true" href="#latent-dirichlet-allocation-lda">#</a></h3>
+<p>A more computationally expensive technique can be used to possibly improve topic coherence.</p>
+<p>In simple terms, LDA considers:</p>
+<ol>
+<li>Documents are made up of a mix of topics. For each document a probability will be assigned to each topic.</li>
+<li>Topics are made up of a mix of words. Words can overlap between different topics.</li>
+</ol>
+<h4 id="result-1">Result<a hidden class="anchor" aria-hidden="true" href="#result-1">#</a></h4>
+<p>Because LDA is a iterative algorithm, due to the limited computational power for this project, LDA could not be explored to it&rsquo;s full potential. Topics were extracted for 2 and 3 topics. This problem could be solved in the future by possibly fitting LDA in chunks.</p>
+<h2 id="post-topic-analysis">Post Topic Analysis<a hidden class="anchor" aria-hidden="true" href="#post-topic-analysis">#</a></h2>
+<p>From the topics extracted using NMF, the table below will define what each topics theme is.</p>
+<table>
+<thead>
+<tr>
+<th>Topic Number</th>
+<th>Overall Theme</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Topic 1</td>
+<td>Reports relating to the devices transmitter</td>
+</tr>
+<tr>
+<td>Topic 2</td>
+<td>Reports relating to the devices signal (loss)</td>
+</tr>
+<tr>
+<td>Topic 3</td>
+<td>Reports relating to the devices glucose readings</td>
+</tr>
+</tbody>
+</table>
+<p>After all device reports cases are given a topic the following plots can provide insight into when certain issues came about.</p>
+<p><em>Insert all plots here</em></p>
+<p><em>add interpretations</em></p>
+<p><a href="https://github.com/trey-capps/Patient-Safety">Link To Code</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2022 <a href="https://trey-capps.github.io">Trey Capps</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
