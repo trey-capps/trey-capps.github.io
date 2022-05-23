@@ -65,12 +65,12 @@ The values in the ``` addition ``` dictionary can be filled and then added to co
 
 When considering the missing values in numeric columns, there only appears to be one for the 'Trust' column for 2018. From the plot below it appears, given the missing row was rank 20, the mean for the entire year is the best imputation.  
 
-![Mean Imputation Plot](https://treycapps.com/static/mean_impute.png)
+![Mean Imputation Plot](static/mean_impute.png)
 
 ### EDA
 Once the data is cleaned, exploratory data analysis can be done to get a better understanding of the data. A pairs plot can be created to get an idea of the distribution of each variable and inspect multicollinearity.
 
-![Pair Plot](https://treycapps.com/static/pairplot.png)
+![Pair Plot](pairplot.png)
 
 Next we can consider the distribution of regions. 
 
