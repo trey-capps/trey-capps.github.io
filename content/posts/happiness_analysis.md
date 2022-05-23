@@ -24,7 +24,7 @@ Kaggle provides csv files for the years 2015 to 2019. Pandas can be used to load
 df15 = pd.read_csv('2015.csv')
 ```
 ### Cleaning
-Once the datasets have been loaded, it appears the data structure is different for 2017, 2018, and 2019. Any dataset specific varibale creation can be done before merging all datasets. For years 2017 to 2019, the 'Region' column has not been given. This will be important for visualizations and may be considered for the model. We can use the Country-Region pairs from 2015 to see if we can impute this column. A simple function was made:
+Once the datasets have been loaded, it appears the data structure is different for 2017, 2018, and 2019. Any dataset specific variable creation can be done before merging all datasets. For years 2017 to 2019, the 'Region' column has not been given. This will be important for visualizations and may be considered for the model. We can use the Country-Region pairs from 2015 to see if we can impute this column. A simple function was made:
 ```
 region = df15.set_index('Country').to_dict()['Region']
 def find_region(df):    
@@ -65,20 +65,20 @@ The values in the ``` addition ``` dictionary can be filled and then added to co
 
 When considering the missing values in numeric columns, there only appears to be one for the 'Trust' column for 2018. From the plot below it appears, given the missing row was rank 20, the mean for the entire year is the best imputation.  
 
-![Mean Imputation Plot](https://trey-capps.github.io/static/mean_impute.png)
+![Mean Imputation Plot](https://treycapps.com/static/mean_impute.png)
 
 ### EDA
 Once the data is cleaned, exploratory data analysis can be done to get a better understanding of the data. A pairs plot can be created to get an idea of the distribution of each variable and inspect multicollinearity.
 
-*Insert plot here*
+![Pair Plot](https://treycapps.com/static/pairplot.png)
 
 Next we can consider the distribution of regions. 
 
-*insert region hist here*
+![Region Distribution](https://treycapps.com/static/region_hist.png)
 
 We can see that each country is not represented equally in the dataset. We must take this into consideration during preprocessing. For each predictor, a boxplot can give insight into the 5 number summaries of the data. 
 
-*insert boxplots here*
+![Box Plot](https://treycapps.com/static/boxplot.png)
 
 ## Preprocess
 From EDA, there are a few preprocessing steps that must be done before exploring models. Three preprocessing steps were considered in this analysis.

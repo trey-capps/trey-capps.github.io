@@ -82,8 +82,12 @@ From the topics extracted using NMF, the table below will define what each topic
 
 After all device reports cases are given a topic the following plots can provide insight into when certain issues came about. 
 
-*Insert all plots here*
+![All Topics Plot](https://treycapps.com/static/all_topics.png)
 
-*add interpretations*
+
+
+![Each Topic Plot](https://treycapps.com/static/sep_topics.png)
+
+When considering reports involving glucose readings, we see a large increase in the first year the G6 device was released. This increase dropped back to the moving average and followed a stable uptrend. This could provide evidence that early in the G6’s lifetime, there were issues with readings but this issue was solved. When considering reports involving issues with signals, we see a large increase after about 18 months of release. After this increase, the trend seems to remain flat. This explanation for this change in means is unknown and could be explored in future studies. When considering reports involving transmitters, we see a constant increase in trend since G6’s release. Around July 2019, transmitters overtake signals to become the most occurring issue. Since this date, the difference between transmitter issues and other issues has been increasing. Because of this, issues with transmitters need to be addressed in the future. 
 
 [Link To Code](https://github.com/trey-capps/Patient-Safety)
