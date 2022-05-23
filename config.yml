@@ -56,7 +56,7 @@ params:
         enabled: true # needs to be explicitly set
         title: Trey Capps
         subtitle: "Welcome"
-        imageUrl: "http://www.treycapps.com/static/me_pic.jpg"
+        imageUrl: "http://treycapps.com/static/me_pic.jpg"
         imageWidth: 120
         imageHeight: 120
         imageTitle: my image
@@ -77,12 +77,6 @@ params:
           url: https://www.linkedin.com/in/trey-capps/
         - name: github
           url: https://github.com/trey-capps
-        - name: CV
-          url: www.google.com
-        - name: email
-          url: mailto:trey.capps@yahoo.com
-        - name: medium
-          url: https://medium.com/@trey.capps
 
     analytics:
         google:
