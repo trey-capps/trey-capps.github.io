@@ -65,20 +65,20 @@ The values in the ``` addition ``` dictionary can be filled and then added to co
 
 When considering the missing values in numeric columns, there only appears to be one for the 'Trust' column for 2018. From the plot below it appears, given the missing row was rank 20, the mean for the entire year is the best imputation.  
 
-![Mean Imputation Plot](https://github.com/trey-capps/trey-capps.github.io/mean_impute.png)
+![Mean Imputation Plot](/mean_impute.png)
 
 ### EDA
 Once the data is cleaned, exploratory data analysis can be done to get a better understanding of the data. A pairs plot can be created to get an idea of the distribution of each variable and inspect multicollinearity.
 
-![Pair Plot](pairplot.png)
+![Pair Plot](/pairplot.png)
 
 Next we can consider the distribution of regions. 
 
-![Region Distribution](https://treycapps.com/static/region_hist.png)
+![Region Distribution](/region_hist.png)
 
 We can see that each country is not represented equally in the dataset. We must take this into consideration during preprocessing. For each predictor, a boxplot can give insight into the 5 number summaries of the data. 
 
-![Box Plot](https://treycapps.com/static/boxplot.png)
+![Box Plot](/boxplot.png)
 
 ## Preprocess
 From EDA, there are a few preprocessing steps that must be done before exploring models. Three preprocessing steps were considered in this analysis.
