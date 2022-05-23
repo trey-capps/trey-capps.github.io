@@ -61,8 +61,11 @@ params:
         imageHeight: 120
         imageTitle: my image
         buttons:
+            - name: About
+              url: about
             - name: Projects
               url: posts
+            
 
     # home-info mode
     homeInfoParams:
@@ -99,13 +102,3 @@ params:
         Text: "Suggest Changes" # edit text
         appendFilePath: true # to append file path to Edit link
 
-menu:
-    main:
-        - identifier: about
-          name: About
-          url: /about/
-          weight: 1
-        - identifier: projects
-          name: Projects
-          url: /posts/
-          weight: 2
