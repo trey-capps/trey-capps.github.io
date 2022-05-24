@@ -9,7 +9,7 @@ buildFuture: false
 buildExpired: false
 pygmentsUseClasses: true
 
-googleAnalytics: ""
+googleAnalytics: "UA-229903376-1"
 
 minify:
     disableXML: true
