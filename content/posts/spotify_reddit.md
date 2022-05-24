@@ -128,11 +128,14 @@ def export_data(subreddit, database, num_post = 100):
     
     subreddit_data = subreddit_all[subreddit](num_post = num_post)
 
+    duplicate = []
     for post in subreddit_data:
         try:
             collection.insert_one(post)
         except pymongo.errors.DuplicateKeyError:
-            pass
+            duplicate.append(1)
+    
+    print('{0} records were not added becasue they are duplicates'.format(len(duplicate)))
 ```
 
 ## Next Steps
