@@ -1,14 +1,16 @@
 ---
-title: "Spot-it (In Progress)"
-date: 2022-05-15
+title: "Spot-it - Version 1"
+date: 2022-06-15
 summary: Spot new songs on Reddit based off your current Spotify playlists.
 showtoc: true
 draft: false
 ---
 *Note: This project has been documented on what has been completed. More information to come as I continue working!*
 
+This article describes the steps taken to create the Spot-It web application found [here](https://spot-it-songs.herokuapp.com). 
+
 ## Overview
-Do you ever get tired of being recommended the same songs over and over again while on Spotify? If yes, Reddit is a great place to find new and upcoming artists as well as popular songs. This project seeks to provide a tool for users to explore certain music subreddits with hope to spot songs they may like. This tool also will also provide the option for user to find which songs may be similar to playlist they currently have on Spotify. 
+Do you ever get tired of being recommended the same songs over and over again while on Spotify? If yes, Reddit is a great place to find new and upcoming artists as well as popular songs. This project seeks to provide a tool for users to explore certain music subreddits with hope to spot songs they may like. This tool will also provide the option for users to find which songs may be similar to playlist they currently have on Spotify. 
 
 ## Data Collection
 In order to collect data from Reddit, PRAW (API wrapper) can be used. All API credentials will be saved in the ```config.py``` file. A read-only Reddit instance must be made before gathering posts. Once this is completed, we can scrape post data for the last 100 posts. Because each music subreddit has different title formats it is difficult to create one function to extract songs from all music subreddits. While exploring a solution to this problem, an "extract song" function can be made for each subreddit. The steps for the data collection for the 'indieheads' subreddit are outlined as follows:
@@ -40,106 +42,107 @@ Next, since we have the artist and song name, through the Spotify API we can gat
 
 These data points will be later used to compare songs from Reddit to the user's playlist. 
 To gather these data points for each song, these songs can be searched in the Spotify API using ```spotipy```. Some posts from the subreddit maybe from youtube or other sites. These songs might not exist on Spotify, but if they do we can extract their data. The final output will contain a JSON file with the songs from Reddit that exist on Spotify and the song's data points. 
+ 
 
-The following code is for the 'indieheads' subreddit. 
-```
-def get_indieheads_data(num_post = 50):
-    '''
-    This function will scrape the 'indieheads' subreddit for music information
-    subreddit (str): name of subreddit
-    num_post (int): number of posts to scrape, default = 50, max = 1000
-    returns json file format
-    '''
-    #Create read-only Reddit instance
-    reddit = praw.Reddit(client_id=config.reddit_client_id, 
-                     client_secret = config.reddit_secret_key, 
-                     user_agent=config.reddit_user_agent)
+In the ```reddit_collect.py``` file, the functions ```get_indieheads_data()``` and ```extract_song_data()``` are used to extract song posts from the 'r/indieheads' subreddit and append them to the database for further use. 
 
-    reddit_data = []
-    subreddit = 'indieheads'
-    subreddit_scrape = reddit.subreddit(subreddit)
-    for post in subreddit_scrape.new(limit = num_post):
-        title = post.title
-        url = post.url
-        if ('[FRESH]' in title) and ('reddit' not in url):
-            
-            #Subreddit Data Extraction
-            temp_dict = {}
-            temp_dict['_id'] = post.id
-            #temp_dict['title'] = title
-            temp_dict['created'] = post.created
-            temp_dict['upvotes'] = post.score
-            temp_dict['url'] = url
-            temp_dict['subreddit'] = subreddit
-            
-            artist_all = re.sub(r'\-(.*)', '', title)
-            artist_all = artist_all.replace('[FRESH]', '')
-            temp_dict['artist_all'] = artist_all.lstrip()
-            
-            track = re.sub(r'(.*)\-', '', title)
-            temp_dict['track'] = track.lstrip()
-            
-            
-            #Spotify Data Extraction
-            #Load in API information
-            client_credentials_manager = SpotifyClientCredentials(
-                client_id=config.spotify_client_id, 
-                client_secret=config.spotify_secret_key)
-            sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
-            
-            #Extract song information from Spotify
-            song_res = sp.search('{0} {1}'.format(artist_all, track))
-            if song_res['tracks']['items'] == []:
-                continue
-            else:
-                song_data = extract_song_data(song_res['tracks']['items'][0]['uri'])
-            
-            final_data = {**temp_dict, **song_data}
-            
-            #Add all combined data to list
-            reddit_data.append(final_data)
-        
-        else:
-            continue
-        
-    return reddit_data
-```
-From the output of ```get_indieheads_data()``` function, this data can be added to MongoDB to be saved for the future. 
+## Spotify Functions
+In the final web application, it will be important to collect some of the user's Spotify data. The ```spotify_collect.py``` file contains three functions that can aid in this data collection process.
 
-The following function is used to upload only new posts not already in the database. 
+### Determine User Playlist
+The first function ```list_playlist()``` will return a list of all the users public playlists. This list can be display in a drop down on the dashboard for user selection. This funciton can be found below.
 
 ```
-def export_data(subreddit, database, num_post = 100):
-    '''
-    This function will populate MongoDB with respective subreddit posts
-    subreddit (str): subreddit to scrape and add to DB 
-    '''
-    #Connect to MongoDB
-    client = pymongo.MongoClient(config.mongo_cred)
-    #Define database
-    db = client[database]
-    #Define collection within 'RedditCollect'
-    collection = db[subreddit]
+def list_playlist(user_id):
 
-    subreddit_all = {
-        'indieheads': get_indieheads_data,
-        'Alternativerock': get_Alternativerock_data
-        }
+    play_name = []
+    play_uri = []
     
-    subreddit_data = subreddit_all[subreddit](num_post = num_post)
-
-    duplicate = []
-    for post in subreddit_data:
-        try:
-            collection.insert_one(post)
-        except pymongo.errors.DuplicateKeyError:
-            duplicate.append(1)
+    playlist = sp.user_playlists(user_id)
+    for i in range(0, len(playlist['items'])):
+        play_name.append(playlist['items'][i]['name'])
+        play_uri.append(playlist['items'][i]['uri'])
     
-    print('{0} records were not added becasue they are duplicates'.format(len(duplicate)))
+    #Use playlist name as key and uri as value
+    playlists = dict(zip(play_name, play_uri))
+    
+    return playlists
 ```
 
-## Next Steps
-- Refine the following code to improve and speed up the data collection process
-    - Automated collection can be explored in the future
-- Create a model to find similar songs between the user's playlists and the subreddit
-- Create a dashboard to collect user playlist data 
+### Determine Songs from Playlist
+Once a user selects a playlist, we must gather all songs from that selected playlist. ```Spotipy``` makes this process easy by providing songs based on playlist uri. The ```get_song()`` function can be found below.
+
+```
+def get_song(playlist_uri):
+    
+    song_info = []
+    
+    playlist_songs = sp.playlist_items(playlist_uri)
+    for i in range(0, len(playlist_songs['items'])):
+        each_song = {}
+        #Track identifier
+        each_song['track_id'] = playlist_songs['items'][i]['track']['uri']
+        #Track name
+        each_song['track_name'] = playlist_songs['items'][i]['track']['name']
+        
+        #1st artists on track's identifier
+        each_song['artist_id'] = playlist_songs['items'][i]['track']['artists'][0]['uri']
+        #1st artists on track's name
+        each_song['artist_name'] = playlist_songs['items'][i]['track']['artists'][0]['name']
+
+        song_info.append(each_song)
+        
+    return song_info
+```
+### Get Data on Songs
+Once the songs have been gathered, the audio feature must be extracted for each song. This will serve as our 'prediction' dataset. The ```extract_song_data()``` function can be found below.
+
+```
+def extract_song_data(track_id):
+   
+    #use Spotipy to get track information
+    track_feature = sp.audio_features(track_id)
+
+    #Parse the track information
+    song_info = {}
+    song_info['danceability'] = track_feature[0]['danceability']
+    song_info['energy'] = track_feature[0]['energy']
+    song_info['key'] = track_feature[0]['key']
+    song_info['loudness'] = track_feature[0]['loudness']
+    song_info['mode'] = track_feature[0]['mode']
+    song_info['speechiness'] = track_feature[0]['speechiness']
+    song_info['acousticness'] = track_feature[0]['acousticness']
+    song_info['instrumentalness'] = track_feature[0]['instrumentalness']
+    song_info['liveness'] = track_feature[0]['liveness']
+    song_info['valence'] = track_feature[0]['valence']
+    song_info['tempo'] = track_feature[0]['tempo']
+    song_info['uri'] = track_feature[0]['uri']
+    song_info['duration_ms'] = track_feature[0]['duration_ms']
+    
+    return song_info
+```
+
+## Recommender Model
+The main goal of Spot-it is to recommend songs similar to that of the users playlist. The approach to this problem is to use the reddit data as the dataset the algorithm will be built upon and the user data as a 'new' case we want to predict/classify. 
+
+A clustering approach could be used by creating clusters for each subreddit. The users playlist data could then be assigned to certain clusters and a similarity metric could be generated this way. This causes one issue when the amount of subreddits are increased. There needs to be model created for every subreddit and this model will need to be updated every time the data is changed. For version 1 of Spot-it a simplier, more generalized approach will be used. 
+
+### Cosine Similarity
+Cosine similarity will allow us to take a vector (song data) from the user and find similar vecotrs (songs) within the subreddit of choice. To create a vector for the user, we will average all track features for their selected features. We will call this metric a user's playlist vibe. Cosine similarity will be used to generate subreddit songs based on the users vibe metric (single vector). 
+
+Obviously this approach is very generalized and it will be considered as to whether the vibe is an accurate measure based on user feedback. 
+
+## Web Application Creation - Streamlit
+Once all functions have been created for the tasks we want to carry out, a web application can be created using Streamlit. 
+
+#### User Feedback
+A simple form can be added to gain user feedback on the application. This data will saved in a database for later access.
+
+### App Deployment
+The Streamlit web application was deployed via Heroku.
+
+## Future Versions and Updates
+### Automate Data Collection
+Currently the ```reddit_collect.py``` file must be manually run to update the database with new posts. Automation tools can be used to schedule this process on a certain time frame (once a day, every hour, etc.)
+### Improve Speed
+When working with large playlists, the application becomes quite clunky. By reworking some functions and code structure, the application will run much smoother. 
