@@ -1,6 +1,6 @@
 ---
 title: "Spot-it - Version 1"
-date: 2022-06-15
+date: 2022-06-20
 summary: Spot new songs on Reddit based off your current Spotify playlists.
 showtoc: true
 draft: false
@@ -70,7 +70,7 @@ def list_playlist(user_id):
 ```
 
 ### Determine Songs from Playlist
-Once a user selects a playlist, we must gather all songs from that selected playlist. ```Spotipy``` makes this process easy by providing songs based on playlist uri. The ```get_song()`` function can be found below.
+Once a user selects a playlist, we must gather all songs from that selected playlist. ```Spotipy``` makes this process easy by providing songs based on playlist uri. The ```get_song()``` function can be found below.
 
 ```
 def get_song(playlist_uri):
@@ -133,13 +133,43 @@ Cosine similarity will allow us to take a vector (song data) from the user and f
 Obviously this approach is very generalized and it will be considered as to whether the vibe is an accurate measure based on user feedback. 
 
 ## Web Application Creation - Streamlit
-Once all functions have been created for the tasks we want to carry out, a web application can be created using Streamlit. 
+Once all functions have been created for the tasks we want to carry out, a prototype web application can be created using Streamlit. 
 
 #### User Feedback
 A simple form can be added to gain user feedback on the application. This data will saved in a database for later access.
 
 ### App Deployment
 The Streamlit web application was deployed via Heroku.
+
+## API Creation
+To further increase the functionality of Spot-It, a REST API can be created. Endpoints can be made to retrieve data as well as serve model recommendations. 
+
+### Data Retrieval 
+An example to get the list of subreddits supported by Spot-It is found below.
+```
+@app.route("/getCollections")
+def get_collections():
+    db = client['RedditCollect']
+    items = db.list_collection_names()
+    return {"data": items}
+```
+
+A more user specific endpoint to utilize the ```list_playlist()``` function. 
+
+```
+#list user playlist
+@app.route("/userPlaylist", methods=["GET","POST"])
+def get_user_playlist():
+    if request.method == 'POST':
+        spotify_username = request.form['spotifyUsername']
+    
+    playlists = sc.list_playlist(spotify_username)
+
+    return {"data": playlists}
+```
+
+### Purpose
+This is just an introduction to the functionality of this API. The main purpose of developing this API is to begin to move away from the Streamlit application to a more robust front end. 
 
 ## Future Versions and Updates
 ### Automate Data Collection
