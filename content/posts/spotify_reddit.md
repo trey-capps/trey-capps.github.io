@@ -1,5 +1,5 @@
 ---
-title: "Spot-it - Version 1"
+title: "Spot-it - Version 1 (In Progress)"
 date: 2022-06-20
 summary: Spot new songs on Reddit based off your current Spotify playlists.
 showtoc: true
