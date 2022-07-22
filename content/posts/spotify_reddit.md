@@ -12,39 +12,55 @@ The first version the Spot-It web application demo found [here](https://youtu.be
 ## Overview
 Do you ever get tired of being recommended the same songs over and over again while on Spotify? If yes, Reddit is a great place to find new and upcoming artists as well as popular songs. This project seeks to provide a tool for users to explore certain music subreddits with hope to spot songs they may like. This tool will also provide the option for users to find which songs may be similar to playlist they currently have on Spotify. 
 
-## Data Collection
-In order to collect data from Reddit, PRAW (API wrapper) can be used. All API credentials will be saved in the ```config.py``` file. A read-only Reddit instance must be made before gathering posts. Once this is completed, we can scrape post data for the last 100 posts. Because each music subreddit has different title formats it is difficult to create one function to extract songs from all music subreddits. While exploring a solution to this problem, an "extract song" function can be made for each subreddit. The steps for the data collection for the 'indieheads' subreddit are outlined as follows:
-1. Setup the read-only reddit instance
-2. Specify the subreddit of interest
-3. Determine a filtering metric for posts
-    - '[FRESH]' means this post is referring to a 'fresh find' song
-        - This is what we want so we can filter all new posts by this
-    - A reddit link most likely not be referring to a song that is on Spotify
-4. Posts have been filtered, so the song title must be extracted. 
-    - The general form for 'indieheads' is 'Artist - Song'
-    - Use regular expressions to subset:
-        - Everything before the '-' character -> Artist
-        - Everything after the '-' character -> Song
-5. Store each post in a .json file format 
+## ETL Process
+The ETL process will be broken down into two stages the Reddit stage and then the Spotify stage.
 
-This process may not gather 100% of the songs but in our case, this should be fine because 'most' songs are gathered. 
+### Reddit
+#### Reddit Post Extraction
+The first step in my ETL pipeline is to gather posts from specific subreddits. A python script, ```ingest.py```, can be ran using a bash script to extract the raw data into a Mongo collection. Example bash command for the r/indieheads subreddit:
+```
+python ingest.py \
+    --db="TempPosts" \
+    --coll="CollectRaw" \
+    --sub="indieheads"
+```
+This script can be ran for any subreddit (in this case, music subreddits). 
 
-Next, since we have the artist and song name, through the Spotify API we can gather song data on these songs. The data points are:
-- Danceability 
-- Valence
-- Energy
-- Tempo
-- Loudness
-- Speechiness
-- Instrumentalness
-- Liveness
-- Acousticness
+#### Reddit Post Transformation
+Because each subreddit will have different criteria for what is a song and how to extract the track and artist information, an abstract class will be created and methods will be defined further in the child classes. This class can be seen below:
+```
+class ExtractSong(RedditFeatures):
+    
+    def __init__(self, data_field):
+        super().__init__(data_field)
+    
+    def is_track(self):
+        return '-' in self.title
+    
+    def extract_track():
+        pass
 
-These data points will be later used to compare songs from Reddit to the user's playlist. 
-To gather these data points for each song, these songs can be searched in the Spotify API using ```spotipy```. Some posts from the subreddit maybe from youtube or other sites. These songs might not exist on Spotify, but if they do we can extract their data. The final output will contain a JSON file with the songs from Reddit that exist on Spotify and the song's data points. 
- 
+    def extract_artist():
+        pass
+```
+This class will inherit all the important features we want to keep from the raw JSON file. 
 
-In the ```reddit_collect.py``` file, the functions ```get_indieheads_data()``` and ```extract_song_data()``` are used to extract song posts from the 'r/indieheads' subreddit and append them to the database for further use. 
+By using this class template, we are easily able to add support for many different subreddits by defining the three methods above. This improves the scalability issue that arised in the verison 1 data collection process.
+
+#### MongoDB Class
+To aid in the ETL process, a custom class for basic methods relating to MongoDB can be created. These include establishing a connection, filtering the raw database, uploading data to a collection, and deleting data from a collection. 
+
+#### Reddit ETL Script
+A Python script can be used to incorporate all of our defined methods. We can create a dictionary containing the subreddit name as the key and that subreddits ExtractSong class. 
+Example:
+```
+{ "indieheads": ExtractIndieHeads, 
+  "AlternativeRock": ExtractAlternativeRock}
+```
+This will allow all subreddit data to be extracted from the raw database, filter only the song posts, generate "track" and "artist" fields, and finally append this data into a new staging collection where Spotify data can be added. 
+
+### Spotify 
+This stage is currently in progress.
 
 
 ## Recommender Model
@@ -82,7 +98,6 @@ def get_collections():
 A more user specific endpoint to utilize the ```list_playlist()``` function. 
 
 ```
-#list user playlist
 @app.route("/userPlaylist", methods=["GET","POST"])
 def get_user_playlist():
     if request.method == 'POST':
@@ -94,10 +109,10 @@ def get_user_playlist():
 ```
 
 ### Purpose
-This is just an introduction to the functionality of this API. The main purpose of developing this API is to begin to move away from the Streamlit application to a more robust front end. 
+This is just an introduction to the functionality of this API. The main purpose of developing this API is to begin to move away from the Streamlit application to a more robust front end. This API could also further be developed to offer endpoints for CRUD operations on the database. 
 
 ## Future Versions and Updates
 ### Automate Data Collection
-Currently the ```reddit_collect.py``` file must be manually run to update the database with new posts. Automation tools can be used to schedule this process on a certain time frame (once a day, every hour, etc.)
+Now that the ETL process is more scalable and modular, an orchestration tool such as Airflow will be used to schedule the ETL process on a daily or 12 hr period.
 ### Improve Speed
 When working with large playlists, the application becomes quite clunky. By reworking some functions and code structure, the application will run much smoother. 
