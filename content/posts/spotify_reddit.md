@@ -1,6 +1,6 @@
 ---
 title: "Spot-it (In Progress)"
-date: 2022-07-21
+date: 2022-08-23
 summary: Spot new songs on Reddit based off your current Spotify playlists.
 showtoc: true
 draft: false
@@ -8,6 +8,8 @@ draft: false
 *Note: This project has been documented on what has been completed. More information to come as I continue working!*
 
 The first version the Spot-It web application demo found [here](https://youtu.be/dDmbO5_ccEc).
+
+The link to the updated code can be found [here]()
 
 ## Overview
 Do you ever get tired of being recommended the same songs over and over again while on Spotify? If yes, Reddit is a great place to find new and upcoming artists as well as popular songs. This project seeks to provide a tool for users to explore certain music subreddits with hope to spot songs they may like. This tool will also provide the option for users to find which songs may be similar to playlist they currently have on Spotify. 
@@ -109,7 +111,7 @@ def get_user_playlist():
 ```
 
 ### Purpose
-This is just an introduction to the functionality of this API. The main purpose of developing this API is to begin to move away from the Streamlit application to a more robust front end. This API could also further be developed to offer endpoints for CRUD operations on the database. 
+This is just an introduction to the functionality of this API. The main purpose of developing this API is to begin to move away from the Streamlit application to a more robust front end.  
 
 ## Future Versions and Updates
 ### Automate Data Collection
