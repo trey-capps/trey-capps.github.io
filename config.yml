@@ -80,7 +80,7 @@ params:
         - name: linkedin
           url: https://www.linkedin.com/in/trey-capps/
         - name: CV
-          url: treycapps_resume.pdf
+          url: treycappsresume.pdf
 
     analytics:
         google:
