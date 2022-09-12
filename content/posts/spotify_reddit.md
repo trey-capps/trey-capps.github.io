@@ -1,6 +1,6 @@
 ---
-title: "Spot-it (In Progress)"
-date: 2022-09-01
+title: "Spot It (In Progress)"
+date: 2022-09-12
 summary: Spot new songs on Reddit based off your current Spotify playlists.
 showtoc: true
 draft: false

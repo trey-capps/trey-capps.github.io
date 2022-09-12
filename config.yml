@@ -55,7 +55,7 @@ params:
     profileMode:
         enabled: true # needs to be explicitly set
         title: Trey Capps
-        subtitle: "Welcome to my site!"
+        subtitle: #"Welcome to my site!"
         imageUrl: "me_pic.JPG"
         imageWidth: 120
         imageHeight: 120
@@ -70,7 +70,7 @@ params:
     # home-info mode
     homeInfoParams:
         Title: "Hi there \U0001F44B"
-        Content: Welcome to my site
+        Content: Welcome to my site!
 
     socialIcons:
         - name: github
@@ -94,4 +94,3 @@ params:
         hidden: true # hide everywhere but not in structured data
         hiddenInList: true # hide on list pages and home
         hiddenInSingle: true # hide on single page
-
