@@ -6,6 +6,6 @@ summary:
   This section is about me.
 ---
 
-I graduated from North Carolina State University in May 2022 with a Bachelor of Science in Statistics and a minor in Mathematics. Apart from data, I enjoy hiking, music, and playing golf. 
+I currently work at MetLife on the data science and analytics team. I am currently working on projects surrounding machine learning and data engineering.
 
-To talk about data science, golf, or any other inquiries, feel free to message me on Linkedin or reach out through email.
+For any inquiries or to collaborate on any projects, feel free to message me on Linkedin or reach out through email.
